@@ -1,0 +1,42 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    
+}
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: url(./12.jpg);
+      /* background: radial-gradient(hsl(196, 82%, 65%),rgb(80, 87, 212)); */
+}
+.main{
+    display:  flex;
+    gap: 7vmix;
+}
+.main .eye{
+    width: 25vmin;
+    height: 25vmin;
+    background-color: white;
+    border-radius: 50%;
+    box-shadow: 0 0 4vmin rgba(0, 0, 0, 2),
+                    inset 0 0 2vmin rgb(0, 149, 255),
+                    inset 0 0 4vmin rgb(0, 149, 255);
+    position: relative;
+}
+.main .eye::before{
+    content: '';
+    position: absolute;
+    width: 40%;
+    height: 40%;
+    border-radius: 50%;
+    background: white;
+    top: 50%;
+    left: 30%;
+    transform: translate(-50%,-50%);
+    background-color: rgba(7, 7, 7, 0.708);
+    border: 1vmin solid rgb(0, 149, 255);
+    box-sizing: border-box;
+}

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>静态正方体旋转效果</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: black;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="fireworks"></canvas>
+    <script>
+        const canvas = document.getElementById('fireworks');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let mouseX = canvas.width / 2;
+        let mouseY = canvas.height / 2;
+        let angleX = 0;
+        let angleY = 0;
+        let isMouseMoving = false;
+
+        class Vertex {
+            constructor(x, y, z) {
+                this.x = x;
+                this.y = y;
+                this.z = z;
+            }
+
+            project() {
+                const scale = 600 / (600 + this.z);
+                this.screenX = this.x * scale + canvas.width / 2;
+                this.screenY = this.y * scale + canvas.height / 2;
+            }
+        }
+
+        class Edge {
+            constructor(v1, v2) {
+                this.v1 = v1;
+                this.v2 = v2;
+            }
+
+            draw(ctx) {
+                ctx.beginPath();
+                ctx.moveTo(this.v1.screenX, this.v1.screenY);
+                ctx.lineTo(this.v2.screenX, this.v2.screenY);
+                ctx.stroke();
+            }
+        }
+
+        let vertices = [];
+        let edges = [];
+
+        function createCube() {
+            const size = 100;
+            vertices = [
+                new Vertex(-size, -size, -size),
+                new Vertex(size, -size, -size),
+                new Vertex(size, size, -size),
+                new Vertex(-size, size, -size),
+                new Vertex(-size, -size, size),
+                new Vertex(size, -size, size),
+                new Vertex(size, size, size),
+                new Vertex(-size, size, size)
+            ];
+
+            edges = [
+                new Edge(vertices[0], vertices[1]),
+                new Edge(vertices[1], vertices[2]),
+                new Edge(vertices[2], vertices[3]),
+                new Edge(vertices[3], vertices[0]),
+                new Edge(vertices[4], vertices[5]),
+                new Edge(vertices[5], vertices[6]),
+                new Edge(vertices[6], vertices[7]),
+                new Edge(vertices[7], vertices[4]),
+                new Edge(vertices[0], vertices[4]),
+                new Edge(vertices[1], vertices[5]),
+                new Edge(vertices[2], vertices[6]),
+                new Edge(vertices[3], vertices[7])
+            ];
+        }
+
+        function rotateX(angle) {
+            for (let vertex of vertices) {
+                const y = vertex.y;
+                const z = vertex.z;
+                vertex.y = y * Math.cos(angle) - z * Math.sin(angle);
+                vertex.z = y * Math.sin(angle) + z * Math.cos(angle);
+            }
+        }
+
+        function rotateY(angle) {
+            for (let vertex of vertices) {
+                const x = vertex.x;
+                const z = vertex.z;
+                vertex.x = x * Math.cos(angle) + z * Math.sin(angle);
+                vertex.z = -x * Math.sin(angle) + z * Math.cos(angle);
+            }
+        }
+
+        function animate() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            if (isMouseMoving) {
+                rotateX(angleX);
+                rotateY(angleY);
+            }
+
+            for (let vertex of vertices) {
+                vertex.project();
+            }
+
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2;
+
+            for (let edge of edges) {
+                edge.draw(ctx);
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        function onMouseMove(event) {
+            const dx = event.clientX - mouseX;
+            const dy = event.clientY - mouseY;
+            angleX += dy * 0.01;
+            angleY += dx * 0.01;
+            mouseX = event.clientX;
+            mouseY = event.clientY;
+            isMouseMoving = true;
+
+            // Reset isMouseMoving after a short delay
+            setTimeout(() => {
+                isMouseMoving = false;
+            }, 100);
+        }
+
+        canvas.addEventListener('mousemove', onMouseMove);
+
+        createCube();
+        animate();
+    </script>
+</body>
+</html>
